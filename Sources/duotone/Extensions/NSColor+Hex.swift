@@ -33,16 +33,16 @@ extension NSColor {
     }
     
     var hexString: String {
-        var r:CGFloat = 0
-        var g:CGFloat = 0
-        var b:CGFloat = 0
-        var a:CGFloat = 0
-
-        getRed(&r, green: &g, blue: &b, alpha: &a)
-
-        let rgb:Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
-
+        let rgb:Int = (Int)(self.redValue*255)<<16 | (Int)(self.greenValue*255)<<8 | (Int)(self.blueValue*255)<<0
         return String(format:"#%06x", rgb)
     }
 }
+
+extension NSColor {
+    var redValue: CGFloat { return CIColor(color: self)!.red }
+    var greenValue: CGFloat { return CIColor(color: self)!.green }
+    var blueValue: CGFloat { return CIColor(color: self)!.blue }
+    var alphaValue: CGFloat { return CIColor(color: self)!.alpha }
+}
+
 

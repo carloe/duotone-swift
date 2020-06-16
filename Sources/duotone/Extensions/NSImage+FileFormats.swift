@@ -40,11 +40,9 @@ fileprivate extension FileFormat {
 
 extension NSImage {
     func imageRepresentation(for format: FileFormat) -> NSData? {
-        if let imageTiffData = self.tiffRepresentation, let imageRep = NSBitmapImageRep(data: imageTiffData) {
-            // let imageProps = [NSImageCompressionFactor: 0.9] // Tiff/Jpeg
-            // let imageProps = [NSImageInterlaced: NSNumber(value: true)] // PNG
-            let imageProps: [NSBitmapImageRep.PropertyKey: Any] = [:]
-            let imageData = imageRep.representation(using: format.representationFormat, properties: imageProps) as NSData?
+        if let data = self.tiffRepresentation, let imageRep = NSBitmapImageRep(data: data) {
+            let properties: [NSBitmapImageRep.PropertyKey: Any] = [:]
+            let imageData = imageRep.representation(using: format.representationFormat, properties: properties) as NSData?
             return imageData
         }
         return nil
