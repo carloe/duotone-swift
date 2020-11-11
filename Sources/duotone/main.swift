@@ -27,6 +27,9 @@ struct Duotone: ParsableCommand {
    @Option(name: .shortAndLong, help: "Path to the output file")
    var output: String
    
+   @Flag(name: .shortAndLong, help: "Verbose output")
+   var verbose = false
+   
    func run() throws {
       let startTime = CFAbsoluteTimeGetCurrent()
       
@@ -62,9 +65,11 @@ struct Duotone: ParsableCommand {
       }
       outputData.write(toFile: outputPath, atomically: false)
       
-      let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-      print("Output: \(outputPath)")
-      print("Completed in \(timeElapsed)s")
+      if verbose == true {
+         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+         print("Output: \(outputPath)")
+         print("Completed in \(timeElapsed)s")
+      }
    }
    
    private func loadInputImage() throws -> NSImage {
