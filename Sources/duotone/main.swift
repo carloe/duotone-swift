@@ -55,7 +55,8 @@ struct Duotone: ParsableCommand {
       let outputImage: NSImage
       let format = FileFormat(filename: outputPath)
       do {
-         outputImage = try ImageProcessor.colorMap(inputImage, darkColor: inColorDark, lightColor: inColorLight,
+         let processor = try! ImageProcessor()
+         outputImage = try processor.colorMap(inputImage, darkColor: inColorDark, lightColor: inColorLight,
                                                    contrast: contrastValue, blend: blendValue)
       } catch {
          throw DuotoneError("Failed to initialize Metal shader.")
