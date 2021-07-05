@@ -11,38 +11,54 @@ enum ColorHexError: Error {
     case invalidFormat
 }
 
-extension NSColor {
-    convenience init(hex: String, alpha: CGFloat = 1.0) throws {
+public extension NSColor {
+    convenience init(hex: String) throws {
         var hexFormatted: String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).uppercased()
 
         if hexFormatted.hasPrefix("#") {
             hexFormatted = String(hexFormatted.dropFirst())
         }
 
-        if hexFormatted.count != 6 {
-            throw ColorHexError.invalidFormat
-        }
-        
         var rgbValue: UInt64 = 0
         Scanner(string: hexFormatted).scanHexInt64(&rgbValue)
 
-        self.init(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-                  green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-                  blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-                  alpha: alpha)
-    }
-    
-    var hexString: String {
-        let rgb:Int = (Int)(self.redValue*255)<<16 | (Int)(self.greenValue*255)<<8 | (Int)(self.blueValue*255)<<0
-        return String(format:"#%06x", rgb)
+        var red, green, blue: CGFloat
+        var alpha: CGFloat = 1.0
+
+        if hexFormatted.count == 2 {
+            let value = CGFloat(rgbValue & 0xFF) / 255.0
+            red = value
+            green = value
+            blue = value
+        } else if hexFormatted.count == 3 {
+            red = CGFloat((rgbValue & 0xF00) >> 8) / 15.0
+            green = CGFloat((rgbValue & 0x0F0) >> 4) / 15.0
+            blue = CGFloat(rgbValue & 0x00F) / 15.0
+        } else if hexFormatted.count == 4 {
+            red =  CGFloat((rgbValue & 0xF000) >> 12) / 15
+            green = CGFloat((rgbValue & 0x0F00) >> 8) / 15
+            blue = CGFloat((rgbValue & 0x00F0) >> 4) / 15
+            alpha = CGFloat(rgbValue & 0x000F) / 15
+        } else if hexFormatted.count == 6 {
+            red = CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0
+            green = CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0
+            blue = CGFloat(rgbValue & 0x0000FF) / 255.0
+        } else if hexFormatted.count == 8 {
+            red =  CGFloat((rgbValue & 0xFF000000) >> 24) / 255.0
+            green = CGFloat((rgbValue & 0x00FF0000) >> 16) / 255.0
+            blue = CGFloat((rgbValue & 0x0000FF00) >> 8) / 255.0
+            alpha = CGFloat(rgbValue & 0x000000FF) / 255.0
+        } else {
+            throw ColorHexError.invalidFormat
+        }
+
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
 
 extension NSColor {
-    var redValue: CGFloat { return CIColor(color: self)!.red }
-    var greenValue: CGFloat { return CIColor(color: self)!.green }
-    var blueValue: CGFloat { return CIColor(color: self)!.blue }
-    var alphaValue: CGFloat { return CIColor(color: self)!.alpha }
+    var redValue: CGFloat { return CIColor(color: self)?.red ?? 0.0 }
+    var greenValue: CGFloat { return CIColor(color: self)?.green ?? 0.0 }
+    var blueValue: CGFloat { return CIColor(color: self)?.blue ?? 0.0 }
+    var alphaValue: CGFloat { return CIColor(color: self)?.alpha ?? 0.0 }
 }
-
-
