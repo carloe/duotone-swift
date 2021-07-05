@@ -18,7 +18,11 @@ duotone --help
 ## Usage
 
 ```bash
-duotone --input input.jpg --light-color '#FFCB00' --dark-color '#38046C' --output output.png
+# Single Image...
+duotone input.jpg --light '#FFCB00' --dark '#38046C' --out output.png
+
+# Batch processing...
+duotone ~/images --light '#FFCB00' --dark '#38046C' --out ~/images/out
 ```
 
 ## License

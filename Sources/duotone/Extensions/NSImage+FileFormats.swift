@@ -10,7 +10,7 @@ import AppKit
 enum FileFormat: String {
     case png
     case jpg
-    
+
     var fileExtension: String {
         switch self {
         case .png:
@@ -19,15 +19,14 @@ enum FileFormat: String {
             return "jpg"
         }
     }
-    
+
     init(filename: String) {
         let ext = URL(fileURLWithPath: filename).pathExtension
-        if ext == "png" { self = .png }
-        else { self = .jpg }
+        if ext == "png" { self = .png } else { self = .jpg }
     }
 }
 
-fileprivate extension FileFormat {
+private extension FileFormat {
     var representationFormat: NSBitmapImageRep.FileType {
         switch self {
         case .png:
