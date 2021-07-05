@@ -22,7 +22,7 @@ extension Duotone {
             let presets = try Duotone.loadPresets()
             let filtered = presets.filter { $0.name != name}
             if presets.count == filtered.count {
-                throw "No existing preset with name '\(name)' found"
+                throw ValidationError("No existing preset with name '\(name)' found")
             }
             try Duotone.savePresets(filtered)
             print("Removed '\(name)'")

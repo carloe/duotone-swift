@@ -17,7 +17,7 @@ extension Duotone {
             return [Preset]()
         }
         guard let data = try? Data(contentsOf: file.url) else {
-            throw "Could not read the preset file: \(presetLocation)."
+            throw ValidationError("Could not read the preset file: \(presetLocation).")
         }
         return try JSONDecoder().decode([Preset].self, from: data)
     }

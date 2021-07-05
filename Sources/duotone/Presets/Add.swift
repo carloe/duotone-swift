@@ -51,7 +51,7 @@ extension Duotone {
             var presets = try Duotone.loadPresets()
             let exists = presets.contains { $0.name == preset.name }
             if exists {
-                throw "A preset with the name '\(preset.name)' already exists"
+                throw ValidationError("A preset with the name '\(preset.name)' already exists")
             }
             presets.append(preset)
             try Duotone.savePresets(presets)
