@@ -14,7 +14,7 @@ private let validImageExtensions = ["jpg", "jpeg", "png"]
 struct Duotone: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "A utility for duotoning images.",
-        subcommands: [Process.self, Add.self, Remove.self],
+        subcommands: [Process.self, Add.self, Remove.self, List.self],
         defaultSubcommand: Process.self)
 }
 
