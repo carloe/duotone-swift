@@ -24,42 +24,42 @@ enum ProcessorError: Error {
 class ImageProcessor {
     private static let functionName = "shaderKernel"
     private static let shaderSource = """
-        #include <metal_stdlib>
-        using namespace metal;
+    #include <metal_stdlib>
+    using namespace metal;
 
-        kernel void shaderKernel(texture2d<float, access::read> inTexture [[ texture(0) ]],
-                                 texture2d<float, access::write> outTexture [[ texture(1) ]],
-                                 constant float3 &lightColor [[ buffer(2) ]],
-                                 constant float3 &darkColor [[ buffer(3) ]],
-                                 constant float &duotoneContrast [[ buffer(4) ]],
-                                 constant float &duotoneBlend [[ buffer(5) ]],
-                                 uint2 gid [[ thread_position_in_grid ]]) {
-            float4 texColor = inTexture.read(gid);
-            
-            float red = texColor.r;
-            float green = texColor.g;
-            float blue = texColor.b;
-            if (duotoneContrast != 0.5) {
-                float normalizedContrast = (1.0 + duotoneContrast - 0.5);
-                red = (red  - 0.5) * normalizedContrast + 0.5;
-                green = (green  - 0.5) * normalizedContrast + 0.5;
-                blue = (blue  - 0.5) * normalizedContrast + 0.5;
-            }
-            float lum = 0.299 * red + 0.587 * green + 0.114 * blue;
-            float newRed = ((lightColor.r * lum + (darkColor.r * (1.0 - lum))) * duotoneBlend) + (red * (1.0 - duotoneBlend));
-            float newGreen = ((lightColor.g * lum + (darkColor.g * (1.0 - lum))) * duotoneBlend) + (green * (1.0 - duotoneBlend));
-            float newBlue = ((lightColor.b * lum + (darkColor.b * (1.0 - lum))) * duotoneBlend) + (blue * (1.0 - duotoneBlend));
-            texColor = float4(newRed, newGreen, newBlue, texColor.a);
-            
-            outTexture.write(texColor, gid);
+    kernel void shaderKernel(texture2d<float, access::read> inTexture [[ texture(0) ]],
+                             texture2d<float, access::write> outTexture [[ texture(1) ]],
+                             constant float3 &lightColor [[ buffer(2) ]],
+                             constant float3 &darkColor [[ buffer(3) ]],
+                             constant float &duotoneContrast [[ buffer(4) ]],
+                             constant float &duotoneBlend [[ buffer(5) ]],
+                             uint2 gid [[ thread_position_in_grid ]]) {
+        float4 texColor = inTexture.read(gid);
+
+        float red = texColor.r;
+        float green = texColor.g;
+        float blue = texColor.b;
+        if (duotoneContrast != 0.5) {
+            float normalizedContrast = (1.0 + duotoneContrast - 0.5);
+            red = (red  - 0.5) * normalizedContrast + 0.5;
+            green = (green  - 0.5) * normalizedContrast + 0.5;
+            blue = (blue  - 0.5) * normalizedContrast + 0.5;
         }
-        """
-    
+        float lum = 0.299 * red + 0.587 * green + 0.114 * blue;
+        float newRed = ((lightColor.r * lum + (darkColor.r * (1.0 - lum))) * duotoneBlend) + (red * (1.0 - duotoneBlend));
+        float newGreen = ((lightColor.g * lum + (darkColor.g * (1.0 - lum))) * duotoneBlend) + (green * (1.0 - duotoneBlend));
+        float newBlue = ((lightColor.b * lum + (darkColor.b * (1.0 - lum))) * duotoneBlend) + (blue * (1.0 - duotoneBlend));
+        texColor = float4(newRed, newGreen, newBlue, texColor.a);
+
+        outTexture.write(texColor, gid);
+    }
+    """
+
     private var device: MTLDevice!
     private var queue: MTLCommandQueue!
     private var loader: MTKTextureLoader!
     private var computePipelineState: MTLComputePipelineState!
-    
+
     init() throws {
         guard let device = MTLCreateSystemDefaultDevice() else {
             throw ProcessorError.failedToCreateMetalDevice
@@ -79,7 +79,7 @@ class ImageProcessor {
         self.computePipelineState = try self.device.makeComputePipelineState(function: function)
         self.loader = MTKTextureLoader(device: device)
     }
-    
+
     func colorMap(_ image: NSImage, darkColor: NSColor, lightColor: NSColor, contrast: CGFloat = 0.5, blend: CGFloat = 0.5) throws -> NSImage {
         guard let imageData = image.tiffRepresentation else {
             throw ProcessorError.unknown
@@ -126,12 +126,21 @@ class ImageProcessor {
         let (width, height) = (texture.width, texture.height)
         let rowBytes = width * 4
 
-        var buffer = Array<UInt8>(repeating: 0, count: rowBytes*height)
+        var buffer = [UInt8](repeating: 0, count: rowBytes * height)
         let region = MTLRegionMake2D(0, 0, width, height)
         texture.getBytes(&buffer, bytesPerRow: rowBytes, from: region, mipmapLevel: 0)
 
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        guard let context = CGContext(data: &buffer, width: width, height: height, bitsPerComponent: 8, bytesPerRow: rowBytes, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { throw ProcessorError.failedToCreateCGImage }
+        guard let context = CGContext(data: &buffer,
+                                      width: width,
+                                      height: height,
+                                      bitsPerComponent: 8,
+                                      bytesPerRow: rowBytes,
+                                      space: colorSpace,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else {
+            throw ProcessorError.failedToCreateCGImage
+        }
         guard let result = context.makeImage() else { throw ProcessorError.failedToCreateCGImage }
         return NSImage(cgImage: result, size: CGSize(width: result.width, height: result.height))
     }
