@@ -25,8 +25,8 @@ extension Duotone {
         @Argument(help: "The source file or folder")
         var inputPath: String
 
-        @Flag(name: .shortAndLong, help: "Print verbose output")
-        var verbose = false
+        @Option(name: [.short, .customLong("preset")], help: "The name of a preset")
+        var presetName: String?
 
         @Option(name: [.short, .customLong("light")], help: "The lightest color in hex")
         var lightHexOption: String
@@ -39,6 +39,9 @@ extension Duotone {
 
         @Option(name: [.short, .customLong("blend")], help: "Blend value between 0.0 and 1.0")
         var blendOption: Float?
+
+        @Flag(name: .shortAndLong, help: "Print verbose output")
+        var verbose = false
 
         @Option(name: [.short, .customLong("out")], help: "Path where the output files are saved")
         var outputPath: String
@@ -57,11 +60,11 @@ extension Duotone {
 
             if verbose {
                 print("-[Settings]----------------------")
-                print("   📁 Source:   \(inputPath)")
-                print("   🎨 Light:    \(lightColor.toHexString())")
-                print("   🎨 Dark:     \(darkColor.toHexString())")
-                print("   🎛️ Contrast:  \(contrast)")
-                print("   🎛️ Blend:     \(blend)")
+                print(" - 📁 Source:   \(inputPath)")
+                print(" - 🎨 Light:    \(lightColor.toHexString())")
+                print(" - 🎨 Dark:     \(darkColor.toHexString())")
+                print(" - 🎛️ Contrast: \(contrast)")
+                print(" - 🎛️ Blend:    \(blend)")
                 print("---------------------------------\n")
                 print("🔎 Scanning '\(inputPath)'...")
             }
