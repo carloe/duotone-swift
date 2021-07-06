@@ -9,7 +9,7 @@ struct DuotoneError: Error, CustomStringConvertible {
     init(_ description: String) { self.description = description }
 }
 
-private let validImageExtensions = ["jpg", "jpeg", "png"]
+private let validImageExtensions = ["jpg", "jpeg", "png", "webp"]
 
 struct Duotone: ParsableCommand {
     static var configuration = CommandConfiguration(
