@@ -17,12 +17,32 @@ duotone --help
 
 ## Usage
 
+Duotone individual files or batch process entire folders.
+
 ```bash
 # Single Image...
 duotone input.jpg --light '#FFCB00' --dark '#38046C' --out output.png
 
 # Batch processing...
 duotone ~/images --light '#FFCB00' --dark '#38046C' --out ~/images/out
+```
+
+## Presets
+
+Settings can be saved as preset so they can be reused without having to juggle or memorize hex colors.
+
+```bash
+# List all presets
+duotone list
+
+# Add a new preset named 'foo'
+duotone add --preset foo --light '#FFCB00' --dark '#38046C' --contrast 0.5 --blend 0.5
+
+# Remove the preset named foo
+duotone remove --preset foo
+
+# Apply the preset 'foo' to 'file.jpg'
+duotone file.jpg --preset foo --out result.jpg
 ```
 
 ## License
