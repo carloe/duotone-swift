@@ -16,16 +16,16 @@ extension Duotone {
         static var configuration = CommandConfiguration(abstract: "Remove a presets.")
 
         @Option(name: .long, help: "The name of the preset")
-        var name: String
+        var preset: String
 
         mutating func run() throws {
             let presets = try Duotone.loadPresets()
-            let filtered = presets.filter { $0.name != name}
+            let filtered = presets.filter { $0.name != preset}
             if presets.count == filtered.count {
-                throw ValidationError("No existing preset with name '\(name)' found")
+                throw ValidationError("No existing preset with name '\(preset)' found")
             }
             try Duotone.savePresets(filtered)
-            print("Removed '\(name)'")
+            print("Removed '\(preset)'")
         }
     }
 }

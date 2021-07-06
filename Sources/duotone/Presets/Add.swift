@@ -14,7 +14,7 @@ extension Duotone {
         static var configuration = CommandConfiguration(abstract: "Add a presets.")
 
         @Option(name: .long, help: "The name of the preset")
-        var name: String
+        var preset: String
 
         @Option(name: [.short, .customLong("light")], help: "The lightest color in hex")
         var lightHexOption: String
@@ -41,7 +41,7 @@ extension Duotone {
             var blend = (blendOption != nil) ? CGFloat(blendOption!) : 1.0
             if blend > 1.0 { blend = 1.0 } else if blend < 0.0 { blend = 0.0 }
 
-            let preset = Preset(name: name,
+            let preset = Preset(name: preset,
                                 light: lightColor.toHexString(),
                                 dark: darkColor.toHexString(),
                                 contrast: contrast,
