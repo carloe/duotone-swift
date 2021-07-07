@@ -9,8 +9,6 @@ struct DuotoneError: Error, CustomStringConvertible {
     init(_ description: String) { self.description = description }
 }
 
-private let validImageExtensions = ["jpg", "jpeg", "png", "tiff", "tif", "bmp"]
-
 struct Duotone: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "A utility for duotoning images.",
@@ -76,7 +74,7 @@ extension Duotone {
         private func preset() throws -> Preset {
             if let presetName = presetName {
                 let presets = try Duotone.loadPresets()
-                let preset = presets.first {  $0.name == presetName }
+                let preset = presets.first { $0.name == presetName }
                 guard let preset = preset else {
                     throw ValidationError("No preset with name '\(presetName)' found.")
                 }
@@ -109,17 +107,21 @@ extension Duotone {
                 if verbose {
                     print("- [\(index + 1)/\(imagePaths.count)] Processing: \(file.name)")
                 }
-                guard let inputImage = NSImage(contentsOfFile: file.path) else {
-                    throw ValidationError("Could not read image at \(file.path)")
+
+                guard let ext = file.extension,
+                      let format = FileFormat(rawValue: ext),
+                      let inputImage = NSImage(contentsOfFile: file.path)
+                else {
+                    throw ValidationError("Failed to load \(file.name)")
                 }
-                let format = FileFormat(filename: file.path)
+
                 let outputImage = try processor.colorMap(inputImage,
                                                          darkColor: darkColor,
                                                          lightColor: lightColor,
                                                          contrast: preset.contrast,
                                                          blend: preset.blend)
                 guard let outputData = outputImage.imageRepresentation(for: format) as Data? else {
-                    throw ValidationError("Failed to save image.")
+                    throw ValidationError("Failed to save '\(file.name)'")
                 }
 
                 try outputFolder.createFile(at: file.name, contents: outputData)
@@ -129,14 +131,14 @@ extension Duotone {
 
         private func processInput() throws -> [File] {
             if let file = try? File(path: inputPath) {
-                if let ext = file.extension, validImageExtensions.contains(ext) {
+                if let ext = file.extension, FileFormat.allValidExtensions.contains(ext) {
                     return [file]
                 }
                 throw ValidationError("\(file.name) is not a valid image format.")
             } else {
                 var inputFiles = [File]()
                 for file in try Folder(path: inputPath).files {
-                    if let ext = file.extension, validImageExtensions.contains(ext) {
+                    if let ext = file.extension, FileFormat.allValidExtensions.contains(ext) {
                         inputFiles.append(file)
                     }
                 }

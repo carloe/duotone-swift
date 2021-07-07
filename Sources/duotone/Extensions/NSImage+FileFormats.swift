@@ -7,36 +7,48 @@
 
 import AppKit
 
-enum FileFormat: String {
+enum FileFormat: String, CaseIterable {
     case png
     case jpg
     case tiff
     case bmp
 
+    static private var _allValidExtensions: [String]?
+    static var allValidExtensions: [String] {
+        if let exts = _allValidExtensions { return exts }
+        var exts = [String]()
+        for format in self.allCases {
+            exts.append(contentsOf: format.validExtensions)
+        }
+        _allValidExtensions = exts
+        return exts
+    }
+
     var fileExtension: String {
+        return self.validExtensions.first!
+    }
+
+    var validExtensions: [String] {
         switch self {
         case .png:
-            return "png"
+            return ["png"]
         case .jpg:
-            return "jpg"
+            return ["jpg", "jpeg"]
         case .tiff:
-            return "tiff"
+            return ["tiff", "tiff"]
         case .bmp:
-            return "bmp"
+            return ["bmp"]
         }
     }
 
-    init(filename: String) {
-        let ext = URL(fileURLWithPath: filename).pathExtension
-        if ext == "png" {
-            self = .png
-        } else if ext == "tif" || ext == "tiff" {
-            self = .tiff
-        } else if ext == "bmp" {
-            self = .bmp
-        } else {
-            self = .jpg
+    init?(rawValue: String) {
+        for format in FileFormat.allCases {
+            if format.validExtensions.contains(rawValue) {
+                self = format
+                return
+            }
         }
+        return nil
     }
 }
 
