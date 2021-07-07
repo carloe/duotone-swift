@@ -9,7 +9,7 @@ struct DuotoneError: Error, CustomStringConvertible {
     init(_ description: String) { self.description = description }
 }
 
-private let validImageExtensions = ["jpg", "jpeg", "png", "webp"]
+private let validImageExtensions = ["jpg", "jpeg", "png"]
 
 struct Duotone: ParsableCommand {
     static var configuration = CommandConfiguration(
@@ -112,7 +112,7 @@ extension Duotone {
                 guard let inputImage = NSImage(contentsOfFile: file.path) else {
                     throw ValidationError("Could not read image at \(file.path)")
                 }
-                let format = FileFormat(filename: outputPath)
+                let format = FileFormat(filename: file.path)
                 let outputImage = try processor.colorMap(inputImage,
                                                          darkColor: darkColor,
                                                          lightColor: lightColor,
