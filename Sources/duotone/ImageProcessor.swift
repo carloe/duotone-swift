@@ -55,10 +55,10 @@ class ImageProcessor {
     }
     """
 
-    private var device: MTLDevice!
-    private var queue: MTLCommandQueue!
-    private var loader: MTKTextureLoader!
-    private var computePipelineState: MTLComputePipelineState!
+    private var device: MTLDevice
+    private var queue: MTLCommandQueue
+    private var loader: MTKTextureLoader
+    private var computePipelineState: MTLComputePipelineState
 
     init() throws {
         guard let device = MTLCreateSystemDefaultDevice() else {
@@ -87,7 +87,10 @@ class ImageProcessor {
 
         let inTexture = try loader.newTexture(data: imageData, options: nil)
         let (width, height) = (inTexture.width, inTexture.height)
-        let outTextureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
+        let outTextureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
+                                                                            width: width,
+                                                                            height: height,
+                                                                            mipmapped: false)
         outTextureDescriptor.usage = [.shaderRead, .shaderWrite]
         guard let outTexture = device.makeTexture(descriptor: outTextureDescriptor) else { throw ProcessorError.failedToCreateTexture }
 
@@ -119,30 +122,8 @@ class ImageProcessor {
         buffer.waitUntilCompleted()
 
         if let error = buffer.error { throw error }
-        return try ImageProcessor.cgImage(from: outTexture)
-    }
-
-    private static func cgImage(from texture: MTLTexture) throws -> NSImage {
-        let (width, height) = (texture.width, texture.height)
-        let rowBytes = width * 4
-
-        var buffer = [UInt8](repeating: 0, count: rowBytes * height)
-        let region = MTLRegionMake2D(0, 0, width, height)
-        texture.getBytes(&buffer, bytesPerRow: rowBytes, from: region, mipmapLevel: 0)
-
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        guard let context = CGContext(data: &buffer,
-                                      width: width,
-                                      height: height,
-                                      bitsPerComponent: 8,
-                                      bytesPerRow: rowBytes,
-                                      space: colorSpace,
-                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        else {
-            throw ProcessorError.failedToCreateCGImage
-        }
-        guard let result = context.makeImage() else { throw ProcessorError.failedToCreateCGImage }
-        return NSImage(cgImage: result, size: CGSize(width: result.width, height: result.height))
+        let img = try outTexture.toImage()
+        return NSImage(cgImage: img, size: CGSize(width: img.width, height: img.height))
     }
 
     private static func float3From(color: NSColor) -> simd_float3 {
