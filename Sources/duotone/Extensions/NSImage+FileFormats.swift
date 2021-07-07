@@ -10,6 +10,8 @@ import AppKit
 enum FileFormat: String {
     case png
     case jpg
+    case tiff
+    case bmp
 
     var fileExtension: String {
         switch self {
@@ -17,12 +19,24 @@ enum FileFormat: String {
             return "png"
         case .jpg:
             return "jpg"
+        case .tiff:
+            return "tiff"
+        case .bmp:
+            return "bmp"
         }
     }
 
     init(filename: String) {
         let ext = URL(fileURLWithPath: filename).pathExtension
-        if ext == "png" { self = .png } else { self = .jpg }
+        if ext == "png" {
+            self = .png
+        } else if ext == "tif" || ext == "tiff" {
+            self = .tiff
+        } else if ext == "bmp" {
+            self = .bmp
+        } else {
+            self = .jpg
+        }
     }
 }
 
@@ -33,6 +47,10 @@ private extension FileFormat {
             return NSBitmapImageRep.FileType.png
         case .jpg:
             return NSBitmapImageRep.FileType.jpeg
+        case .tiff:
+            return NSBitmapImageRep.FileType.tiff
+        case .bmp:
+            return NSBitmapImageRep.FileType.bmp
         }
     }
 }
