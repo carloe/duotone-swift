@@ -3,6 +3,7 @@ disabled_rules:
   - class_delegate_protocol
 included:
   - ./Sources
+  - ./Tests
 analyzer_rules:
   - explicit_self
 force_cast: warning # implicitly

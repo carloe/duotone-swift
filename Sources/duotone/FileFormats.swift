@@ -35,7 +35,7 @@ enum FileFormat: String, CaseIterable {
         case .jpg:
             return ["jpg", "jpeg"]
         case .tiff:
-            return ["tiff", "tiff"]
+            return ["tiff", "tif"]
         case .bmp:
             return ["bmp"]
         }
@@ -43,7 +43,7 @@ enum FileFormat: String, CaseIterable {
 
     init?(rawValue: String) {
         for format in FileFormat.allCases {
-            if format.validExtensions.contains(rawValue) {
+            if format.validExtensions.contains(rawValue.lowercased()) {
                 self = format
                 return
             }
