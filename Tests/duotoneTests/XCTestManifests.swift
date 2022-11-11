@@ -1,4 +1,5 @@
 import XCTest
+@testable import duotone
 
 #if !canImport(ObjectiveC)
 public func allTests() -> [XCTestCaseEntry] {
