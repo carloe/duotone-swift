@@ -45,6 +45,24 @@ duotone remove --preset foo
 duotone file.jpg --preset foo --out result.jpg
 ```
 
+Presets are saved as JSON, and can also be eddited directly.
+
+```bash
+vim ~/.duotone
+```
+
+```json
+[
+  {
+    "blend" : 1,
+    "light" : "#444644",
+    "dark" : "#1e201e",
+    "contrast" : 0.5,
+    "name" : "spacegray"
+  }
+]
+```
+
 ## License
 
 MIT
