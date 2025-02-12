@@ -28,7 +28,7 @@ extension Duotone {
         // MARK: - Methods
 
         mutating func run() throws {
-            let presets = try Duotone.loadPresets()
+            let presets = try PresetStorage.loadPresets()
             
             if presets.isEmpty {
                 print("No presets found.")

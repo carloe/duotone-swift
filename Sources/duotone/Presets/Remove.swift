@@ -19,12 +19,12 @@ extension Duotone {
         var preset: String
 
         mutating func run() throws {
-            let presets = try Duotone.loadPresets()
+            let presets = try PresetStorage.loadPresets()
             let filtered = presets.filter { $0.name != preset}
             if presets.count == filtered.count {
                 throw ValidationError("No existing preset with name '\(preset)' found")
             }
-            try Duotone.savePresets(filtered)
+            try PresetStorage.savePresets(filtered)
             print("Removed '\(preset)'")
         }
     }

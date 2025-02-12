@@ -108,14 +108,14 @@ extension Duotone {
             let newPreset = createPreset(lightColor: lightColor, darkColor: darkColor)
             
             // Load and validate existing presets
-            var presets = try Duotone.loadPresets()
+            var presets = try PresetStorage.loadPresets()
             guard !presets.contains(where: { $0.name == newPreset.name }) else {
                 throw AddError.presetAlreadyExists(newPreset.name)
             }
             
             // Save updated presets
             presets.append(newPreset)
-            try Duotone.savePresets(presets)
+            try PresetStorage.savePresets(presets)
             
             print("Added '\(newPreset.name)'")
         }
