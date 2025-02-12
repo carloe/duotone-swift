@@ -63,6 +63,34 @@ vim ~/.duotone
 ]
 ```
 
+## Development
+
+### Test Coverage
+
+The project includes a script to generate and view test coverage reports:
+
+```bash
+# Make the script executable
+chmod +x scripts/coverage.sh
+
+# View available options
+./scripts/coverage.sh --help
+
+# Generate basic coverage report
+./scripts/coverage.sh
+
+# Show uncovered lines
+./scripts/coverage.sh --uncovered
+
+# Generate HTML coverage report
+./scripts/coverage.sh --html
+
+# Clean build and show detailed coverage
+./scripts/coverage.sh --clean --detailed
+```
+
+The HTML report will be generated at `.build/coverage/index.html`.
+
 ## License
 
 MIT

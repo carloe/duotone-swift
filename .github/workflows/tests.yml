@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode.app
+    
+    - name: Build
+      run: swift build -v
+    
+    - name: Run Tests with Coverage
+      id: coverage
+      run: |
+        chmod +x scripts/coverage.sh
+        ./scripts/coverage.sh --html
+        
+        # Extract coverage percentage for badge
+        COVERAGE=$(cat .build/coverage/coverage.txt)
+        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+    
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: .build/coverage
+        retention-days: 14
+    
+    - name: Create Coverage Badge
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: YOUR_GIST_ID_HERE
+        filename: coverage.json
+        label: coverage
+        message: ${{ steps.coverage.outputs.coverage }}%
+        color: ${{ steps.coverage.outputs.coverage >= 90 && 'success' || steps.coverage.outputs.coverage >= 80 && 'yellow' || 'red' }}
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+status:
+  # Required status check
+  require_coverage:
+    name: "Test Coverage"
+    runs-on: macos-latest
+    needs: test
+    if: always()
+    steps:
+      - name: Check Coverage Status
+        run: |
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "Tests or coverage checks failed"
+            exit 1
+          fi 
