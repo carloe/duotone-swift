@@ -24,39 +24,56 @@ enum TextureError: Error, CustomStringConvertible {
 }
 
 extension MTLTexture {
+    private func validateDimensions() throws {
+        guard width > 0 && height > 0 else {
+            throw TextureError.memoryAllocationFailed
+        }
+    }
+    
     func bytes() throws -> UnsafeMutableRawPointer {
-        let width = self.width
-        let height = self.height
-        let rowBytes = self.width * 4
+        try validateDimensions()
+        
+        // Check for valid pixel format
+        guard self.pixelFormat == .rgba8Unorm else {
+            throw TextureError.imageCreationFailed
+        }
+        
+        let rowBytes = width * 4
         guard let pointer = malloc(width * height * 4) else {
             throw TextureError.memoryAllocationFailed
         }
+        
         self.getBytes(pointer, bytesPerRow: rowBytes, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
         return pointer
     }
 
     func toImage() throws -> CGImage {
+        // Validate pixel format first
+        guard self.pixelFormat == .rgba8Unorm else {
+            throw TextureError.imageCreationFailed
+        }
+        
         let pointer = try bytes()
 
         let pColorSpace = CGColorSpaceCreateDeviceRGB()
         let rawBitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
         let bitmapInfo = CGBitmapInfo(rawValue: rawBitmapInfo)
 
-        let selftureSize = self.width * self.height * 4
+        let textureSize = self.width * self.height * 4
         let rowBytes = self.width * 4
         let releaseMaskImagePixelData: CGDataProviderReleaseDataCallback = { (_, _, _) -> Void in }
-        guard let provider = CGDataProvider(dataInfo: nil, data: pointer, size: selftureSize, releaseData: releaseMaskImagePixelData),
+        guard let provider = CGDataProvider(dataInfo: nil, data: pointer, size: textureSize, releaseData: releaseMaskImagePixelData),
               let cgImageRef = CGImage(width: self.width,
-                                       height: self.height,
-                                       bitsPerComponent: 8,
-                                       bitsPerPixel: 32,
-                                       bytesPerRow: rowBytes,
-                                       space: pColorSpace,
-                                       bitmapInfo: bitmapInfo,
-                                       provider: provider,
-                                       decode: nil,
-                                       shouldInterpolate: true,
-                                       intent: CGColorRenderingIntent.defaultIntent)
+                                     height: self.height,
+                                     bitsPerComponent: 8,
+                                     bitsPerPixel: 32,
+                                     bytesPerRow: rowBytes,
+                                     space: pColorSpace,
+                                     bitmapInfo: bitmapInfo,
+                                     provider: provider,
+                                     decode: nil,
+                                     shouldInterpolate: true,
+                                     intent: CGColorRenderingIntent.defaultIntent)
         else {
             throw TextureError.imageCreationFailed
         }
@@ -65,12 +82,18 @@ extension MTLTexture {
     }
 
     func toCGImage() throws -> CGImage {
+        // Validate pixel format first
+        guard self.pixelFormat == .rgba8Unorm else {
+            throw TextureError.imageCreationFailed
+        }
+        
         let width = self.width
         let height = self.height
-        let rowBytes = self.width * 4
+        let rowBytes = width * 4
         guard let pointer = malloc(width * height * 4) else {
             throw TextureError.memoryAllocationFailed
         }
+        
         self.getBytes(pointer, bytesPerRow: rowBytes, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
         
         let colorSpace = CGColorSpaceCreateDeviceRGB()
