@@ -220,9 +220,7 @@ extension Duotone {
                 blend: preset.blend
             )
             
-            guard let outputData = outputImage.imageRepresentation(for: format) else {
-                throw DuotoneError.processingFailed("Failed to save '\(file.name)'")
-            }
+            let outputData = try outputImage.representation(using: format)
             
             try outputFolder.createFile(at: file.name, contents: outputData)
         }

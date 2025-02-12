@@ -7,19 +7,46 @@
 
 import AppKit
 
+/// Errors that can occur during image format conversion
+enum ImageFormatError: Error {
+    case conversionFailed
+    case invalidFormat
+    case emptyImage
+}
+
 extension NSImage {
-    /// Creates a data representation of the image in the specified format
+    /// Converts the image to data in the specified format
     /// - Parameter format: The desired output format
-    /// - Returns: Image data in the specified format, or nil if conversion fails
-    func imageRepresentation(for format: FileFormat) -> Data? {
-        guard let tiffData = tiffRepresentation,
-              let imageRep = NSBitmapImageRep(data: tiffData) else {
-            return nil
+    /// - Returns: The image data in the specified format
+    /// - Throws: ImageFormatError if conversion fails
+    func representation(using format: FileFormat) throws -> Data {
+        guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            throw ImageFormatError.conversionFailed
         }
         
-        return imageRep.representation(
-            using: format.representationFormat,
-            properties: [:]
-        ) as Data?
+        let imageRep = NSBitmapImageRep(cgImage: cgImage)
+        
+        var properties: [NSBitmapImageRep.PropertyKey: Any] = [:]
+        if format == .jpg {
+            properties[.compressionFactor] = 0.9
+        }
+        
+        guard let data = imageRep.representation(using: format.nsBitmapFormat, properties: properties) else {
+            throw ImageFormatError.conversionFailed
+        }
+        
+        return data
+    }
+}
+
+private extension FileFormat {
+    /// Convert FileFormat to NSBitmapImageRep.FileType
+    var nsBitmapFormat: NSBitmapImageRep.FileType {
+        switch self {
+        case .png:  return .png
+        case .jpg: return .jpeg
+        case .tiff: return .tiff
+        case .bmp:  return .bmp
+        }
     }
 } 
