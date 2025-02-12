@@ -109,6 +109,22 @@ generate_html() {
         -output-dir="$BUILD_DIR/coverage" \
         -show-branches=count
     
+    # Extract and save coverage percentage
+    COVERAGE=$(xcrun llvm-cov report \
+        "$TEST_BINARY" \
+        -instr-profile="$PROFDATA" \
+        -ignore-filename-regex="$IGNORE_REGEX" | \
+        grep "TOTAL" | \
+        awk '{print $NF}' | \
+        cut -d'.' -f1)
+    
+    echo "$COVERAGE" > "$BUILD_DIR/coverage/coverage.txt"
+    
+    # Check coverage threshold
+    if [ "$COVERAGE" -lt 80 ]; then
+        error "Coverage ($COVERAGE%) is below minimum threshold (80%)"
+    fi
+    
     echo "${GREEN}HTML report generated at $BUILD_DIR/coverage/index.html${NC}"
 }
 

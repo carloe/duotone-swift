@@ -92,8 +92,8 @@ extension Duotone {
             
             return Preset(
                 name: preset,
-                light: lightColor.toHexString(),
-                dark: darkColor.toHexString(),
+                light: lightColor.hexString,
+                dark: darkColor.hexString,
                 contrast: contrast,
                 blend: blend,
                 description: description
