@@ -58,7 +58,7 @@ extension Duotone {
                       Blend: \(String(format: "%.2f", preset.blend))
                     """)
                 
-                if let description = preset.description {
+                if let description = preset.presetDescription {
                     print("      Description: \(description)")
                 }
                 print("")
