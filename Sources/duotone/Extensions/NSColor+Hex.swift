@@ -7,6 +7,18 @@
 
 import AppKit
 
+// Add a proper error type
+enum HexColorError: Error, CustomStringConvertible {
+    case invalidHexString(String)
+    
+    var description: String {
+        switch self {
+        case .invalidHexString(let hex):
+            return "\(hex) is not a valid hex color."
+        }
+    }
+}
+
 public extension NSColor {
     convenience init(hex: String) throws {
         var hexFormatted: String = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).uppercased()
@@ -45,7 +57,7 @@ public extension NSColor {
             blue = CGFloat((rgbValue & 0x0000FF00) >> 8) / 255.0
             alpha = CGFloat(rgbValue & 0x000000FF) / 255.0
         } else {
-            throw "\(hex) is not a valid hex color."
+            throw HexColorError.invalidHexString(hex)
         }
 
         self.init(red: red, green: green, blue: blue, alpha: alpha)
@@ -70,5 +82,3 @@ extension NSColor {
     var blueValue: CGFloat { return CIColor(color: self)?.blue ?? 0.0 }
     var alphaValue: CGFloat { return CIColor(color: self)?.alpha ?? 0.0 }
 }
-
-extension String: Error {}

@@ -13,15 +13,8 @@ enum FileFormat: String, CaseIterable {
     case tiff
     case bmp
 
-    static private var _allValidExtensions: [String]?
     static var allValidExtensions: [String] {
-        if let exts = _allValidExtensions { return exts }
-        var exts = [String]()
-        for format in self.allCases {
-            exts.append(contentsOf: format.validExtensions)
-        }
-        _allValidExtensions = exts
-        return exts
+        allCases.flatMap { $0.validExtensions }
     }
 
     var fileExtension: String {
@@ -77,3 +70,12 @@ extension NSImage {
         return nil
     }
 }
+
+enum FileFormats {
+    case jpg
+    case png
+    case bmp
+
+    static let allValidExtensions: [String] = ["jpg", "jpeg", "png", "bmp"]
+}
+

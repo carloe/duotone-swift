@@ -1,0 +1,10 @@
+--swiftversion 6.0
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapcollections before-first
+--wrapparameters before-first
+--extensionacl on-declarations
+--header strip
+--trimwhitespace always
+--stripunusedargs closure-only 

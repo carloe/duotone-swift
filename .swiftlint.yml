@@ -1,19 +1,55 @@
 disabled_rules:
   - nesting
   - class_delegate_protocol
+  - trailing_comma
+  - identifier_name
+
+opt_in_rules:
+  - array_init
+  - attributes
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicit_return
+  - missing_docs
+  - multiline_parameters
+  - operator_usage_whitespace
+  - prefer_self_type_over_type_of_self
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - strict_fileprivate
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+
 included:
   - ./Sources
   - ./Tests
 analyzer_rules:
   - explicit_self
+  - unused_declaration
+  - unused_import
 force_cast: warning # implicitly
 force_try:
   severity: warning # explicitly
-line_length: 150
+line_length:
+  warning: 120
+  error: 150
 type_body_length:
   - 300 # warning
   - 400 # error
 file_length:
   warning: 500
   error: 1200
+function_body_length:
+  warning: 60
+  error: 100
 reporter: "xcode"
