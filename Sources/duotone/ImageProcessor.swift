@@ -111,7 +111,11 @@ class ImageProcessor {
         computeEncoder.setBytes(&contrastFloat, length: MemoryLayout.size(ofValue: contrastFloat), index: 4)
         computeEncoder.setBytes(&blendFloat, length: MemoryLayout.size(ofValue: blendFloat), index: 5)
 
-        computeEncoder.dispatchThreadgroups(inTexture.threadGroups(), threadsPerThreadgroup: inTexture.threadGroupCount())
+        let threadgroupWidth = computePipelineState.threadExecutionWidth
+        let threadgroupHeight = computePipelineState.maxTotalThreadsPerThreadgroup / threadgroupWidth
+        let threadsPerThreadgroup = MTLSize(width: threadgroupWidth, height: threadgroupHeight, depth: 1)
+        let threadsPerGrid = MTLSize(width: width, height: height, depth: 1)
+        computeEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         computeEncoder.endEncoding()
 
         guard let blitEncoder = buffer.makeBlitCommandEncoder() else { throw ProcessorError.failedToCreateMetalEncoder }
