@@ -92,6 +92,7 @@ class ImageProcessor {
                                                                             height: height,
                                                                             mipmapped: false)
         outTextureDescriptor.usage = [.shaderRead, .shaderWrite]
+        outTextureDescriptor.storageMode = .shared
         guard let outTexture = device.makeTexture(descriptor: outTextureDescriptor) else { throw ProcessorError.failedToCreateTexture }
 
         guard let buffer = queue.makeCommandBuffer() else { throw ProcessorError.failedToCreateMetalCommandBuffer }
@@ -117,10 +118,6 @@ class ImageProcessor {
         let threadsPerGrid = MTLSize(width: width, height: height, depth: 1)
         computeEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         computeEncoder.endEncoding()
-
-        guard let blitEncoder = buffer.makeBlitCommandEncoder() else { throw ProcessorError.failedToCreateMetalEncoder }
-        blitEncoder.synchronize(resource: outTexture)
-        blitEncoder.endEncoding()
 
         buffer.commit()
         buffer.waitUntilCompleted()
