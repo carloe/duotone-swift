@@ -107,7 +107,7 @@ class HexColorTests: XCTestCase {
         XCTAssertEqual(color.toHexString(), "#1A7521")
     }
 
-    func testToHexStringWidthSingleValue() throws {
+    func testToHexStringWithSingleValue() throws {
         let hexColor = "#ff"
         let color = try NSColor(hex: hexColor)
         XCTAssertEqual(color.toHexString(), "#FFFFFF")
