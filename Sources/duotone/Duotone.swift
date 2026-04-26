@@ -9,6 +9,7 @@ struct DuotoneError: Error, CustomStringConvertible {
     init(_ description: String) { self.description = description }
 }
 
+@main
 struct Duotone: ParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "A utility for duotoning images.",
@@ -147,5 +148,3 @@ extension Duotone {
         }
     }
 }
-
-Duotone.main()
