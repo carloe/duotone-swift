@@ -85,11 +85,7 @@ class ImageProcessor {
             throw ProcessorError.unknown
         }
 
-        // Load with SRGB: false so the texture preserves gamma-encoded RGB rather
-        // than auto-converting to a linear sRGB format. The shader's Rec. 601 luma
-        // weights are designed for gamma-encoded input, and the round-trip back
-        // through CGColorSpaceCreateDeviceRGB() in toImage() expects the same.
-        let inTexture = try loader.newTexture(data: imageData, options: [.SRGB: NSNumber(value: false)])
+        let inTexture = try loader.newTexture(data: imageData, options: nil)
         let (width, height) = (inTexture.width, inTexture.height)
         let outTextureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
                                                                             width: width,
