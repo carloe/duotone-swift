@@ -84,11 +84,8 @@ extension Duotone {
                 }
                 return preset
             }
-            var contrast = (contrastOption != nil) ? CGFloat(contrastOption!) : 0.5
-            if contrast > 1.0 { contrast = 1.0 } else if contrast < 0.0 { contrast = 0.0 }
-
-            var blend = (blendOption != nil) ? CGFloat(blendOption!) : 1.0
-            if blend > 1.0 { blend = 1.0 } else if blend < 0.0 { blend = 0.0 }
+            let contrast = CGFloat(contrastOption ?? 0.5).clamped(to: 0...1)
+            let blend = CGFloat(blendOption ?? 1.0).clamped(to: 0...1)
             guard let lightHexOption = lightHexOption else {
                 throw ValidationError("Please provide a light hex color.")
             }
