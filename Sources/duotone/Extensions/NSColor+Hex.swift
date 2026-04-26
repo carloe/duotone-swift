@@ -16,7 +16,9 @@ public extension NSColor {
         }
 
         var rgbValue: UInt64 = 0
-        Scanner(string: hexFormatted).scanHexInt64(&rgbValue)
+        guard Scanner(string: hexFormatted).scanHexInt64(&rgbValue) else {
+            throw DuotoneError("\(hex) is not a valid hex color.")
+        }
 
         var red, green, blue: CGFloat
         var alpha: CGFloat = 1.0

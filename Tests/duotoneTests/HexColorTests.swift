@@ -81,6 +81,13 @@ class HexColorTests: XCTestCase {
         XCTAssertThrowsError( try NSColor(hex: hexColor))
     }
 
+    func testParsingWithSixCharNonHexThrows() throws {
+        // 6 chars, no valid hex digits past 'f'. Length matches the 6-char branch
+        // but Scanner.scanHexInt64 returns false; without honoring that we'd silently
+        // produce #000000.
+        XCTAssertThrowsError(try NSColor(hex: "helloo"))
+    }
+
     func testParsingWithNakedValueHex() throws {
         let hexColor = "1A752154"
 
