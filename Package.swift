@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "duotone",
     platforms: [
-      .macOS(.v10_14)
+      .macOS(.v12)
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
