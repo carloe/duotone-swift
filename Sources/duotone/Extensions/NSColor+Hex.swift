@@ -45,7 +45,7 @@ public extension NSColor {
             blue = CGFloat((rgbValue & 0x0000FF00) >> 8) / 255.0
             alpha = CGFloat(rgbValue & 0x000000FF) / 255.0
         } else {
-            throw "\(hex) is not a valid hex color."
+            throw DuotoneError("\(hex) is not a valid hex color.")
         }
 
         self.init(red: red, green: green, blue: blue, alpha: alpha)
@@ -71,4 +71,3 @@ extension NSColor {
     var alphaValue: CGFloat { return CIColor(color: self)?.alpha ?? 0.0 }
 }
 
-extension String: Error {}
