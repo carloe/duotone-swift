@@ -72,4 +72,3 @@ extension NSColor {
     var blueValue: CGFloat { return CIColor(color: self)?.blue ?? 0.0 }
     var alphaValue: CGFloat { return CIColor(color: self)?.alpha ?? 0.0 }
 }
-

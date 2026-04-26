@@ -20,7 +20,6 @@ class FileFormatTests: XCTestCase {
         return image
     }
 
-
     // MARK: Initializing
 
     func testInitializingWithJPEG() throws {

@@ -35,11 +35,9 @@ enum FileFormat: String, CaseIterable {
     }
 
     init?(rawValue: String) {
-        for format in FileFormat.allCases {
-            if format.validExtensions.contains(rawValue.lowercased()) {
-                self = format
-                return
-            }
+        for format in FileFormat.allCases where format.validExtensions.contains(rawValue.lowercased()) {
+            self = format
+            return
         }
         return nil
     }
