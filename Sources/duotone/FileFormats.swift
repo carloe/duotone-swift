@@ -13,15 +13,8 @@ enum FileFormat: String, CaseIterable {
     case tiff
     case bmp
 
-    static private var _allValidExtensions: [String]?
     static var allValidExtensions: [String] {
-        if let exts = _allValidExtensions { return exts }
-        var exts = [String]()
-        for format in self.allCases {
-            exts.append(contentsOf: format.validExtensions)
-        }
-        _allValidExtensions = exts
-        return exts
+        allCases.flatMap(\.validExtensions)
     }
 
     var fileExtension: String {
