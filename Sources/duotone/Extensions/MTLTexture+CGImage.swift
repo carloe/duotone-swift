@@ -1,5 +1,5 @@
 //
-//  MLTexture+CGImage.swift
+//  MTLTexture+CGImage.swift
 //  duotone
 //
 //  Created by Carlo Eugster on 07.07.21.
