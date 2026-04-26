@@ -11,7 +11,7 @@ import Files
 
 extension Duotone {
     struct List: ParsableCommand {
-        static var configuration = CommandConfiguration(abstract: "List all presets.")
+        static let configuration = CommandConfiguration(abstract: "List all presets.")
 
         mutating func run() throws {
             let presets = try Duotone.loadPresets()

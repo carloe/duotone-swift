@@ -10,7 +10,7 @@ struct DuotoneError: Error, CustomStringConvertible {
 }
 
 struct Duotone: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "A utility for duotoning images.",
         version: "1.0.1",
         subcommands: [Process.self, Add.self, Remove.self, List.self],
@@ -19,7 +19,7 @@ struct Duotone: ParsableCommand {
 
 extension Duotone {
     struct Process: ParsableCommand {
-        static var configuration = CommandConfiguration(abstract: "Duotone images.")
+        static let configuration = CommandConfiguration(abstract: "Duotone images.")
 
         @Argument(help: "The source file or folder")
         var inputPath: String
