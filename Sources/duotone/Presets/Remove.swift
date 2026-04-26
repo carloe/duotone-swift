@@ -5,8 +5,6 @@
 //  Created by Carlo Eugster on 05.07.21.
 //
 
-import Foundation
-
 import AppKit
 import ArgumentParser
 import Files

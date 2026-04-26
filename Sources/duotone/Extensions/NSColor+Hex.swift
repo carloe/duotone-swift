@@ -1,6 +1,6 @@
 //
 //  NSColor+Hex.swift
-//  ArgumentParser
+//  duotone
 //
 //  Created by Carlo Eugster on 16.06.20.
 //

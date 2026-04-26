@@ -1,6 +1,6 @@
 //
 //  Preset.swift
-//  ArgumentParser
+//  duotone
 //
 //  Created by Carlo Eugster on 05.07.21.
 //
