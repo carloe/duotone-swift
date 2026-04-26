@@ -15,7 +15,7 @@ extension MTLTexture {
         let height = self.height
         let rowBytes = self.width * 4
         guard let pointer = malloc(width * height * 4) else {
-            throw "Failed to allocate memory."
+            throw DuotoneError("Failed to allocate memory.")
         }
         self.getBytes(pointer, bytesPerRow: rowBytes, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
         return pointer
@@ -44,7 +44,7 @@ extension MTLTexture {
                                        shouldInterpolate: true,
                                        intent: CGColorRenderingIntent.defaultIntent)
         else {
-            throw "Failed to create image."
+            throw DuotoneError("Failed to create image.")
         }
 
         return cgImageRef
