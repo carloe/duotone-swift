@@ -130,7 +130,7 @@ extension Duotone {
             return outputFolder
         }
 
-        private func processInput() throws -> [File] {
+        func processInput() throws -> [File] {
             if let file = try? File(path: inputPath) {
                 if let ext = file.extension, FileFormat.allValidExtensions.contains(ext) {
                     return [file]
