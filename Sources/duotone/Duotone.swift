@@ -102,8 +102,9 @@ extension Duotone {
             let lightColor = try NSColor(hex: preset.light)
             let darkColor = try NSColor(hex: preset.dark)
 
-            try FileManager.default.createDirectory(atPath: outputPath, withIntermediateDirectories: true)
-            let outputFolder = try Folder(path: outputPath)
+            let resolvedOutputPath = NSString(string: outputPath).expandingTildeInPath
+            try FileManager.default.createDirectory(atPath: resolvedOutputPath, withIntermediateDirectories: true)
+            let outputFolder = try Folder(path: resolvedOutputPath)
             let processor = try ImageProcessor()
             for (index, file) in imagePaths.enumerated() {
                 if verbose {
