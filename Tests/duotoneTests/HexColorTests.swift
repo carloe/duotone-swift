@@ -88,6 +88,17 @@ class HexColorTests: XCTestCase {
         XCTAssertThrowsError(try NSColor(hex: "helloo"))
     }
 
+    func testParsingWithMidStringNonHexThrows() throws {
+        // Regression: Scanner.scanHexInt64 returns true after consuming any leading
+        // hex digits, ignoring trailing garbage. Without an isAtEnd check, "badhex"
+        // silently produced #0000AD (rgbValue=0xBAD treated as a 6-char hex).
+        XCTAssertThrowsError(try NSColor(hex: "badhex"))
+        XCTAssertThrowsError(try NSColor(hex: "fxx"))   // 3-char branch
+        XCTAssertThrowsError(try NSColor(hex: "ax"))    // 2-char branch
+        XCTAssertThrowsError(try NSColor(hex: "fxxx"))  // 4-char branch
+        XCTAssertThrowsError(try NSColor(hex: "deadXXXX")) // 8-char branch
+    }
+
     func testParsingWithNakedValueHex() throws {
         let hexColor = "1A752154"
 

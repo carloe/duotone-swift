@@ -16,7 +16,8 @@ public extension NSColor {
         }
 
         var rgbValue: UInt64 = 0
-        guard Scanner(string: hexFormatted).scanHexInt64(&rgbValue) else {
+        let scanner = Scanner(string: hexFormatted)
+        guard scanner.scanHexInt64(&rgbValue), scanner.isAtEnd else {
             throw DuotoneError("\(hex) is not a valid hex color.")
         }
 
