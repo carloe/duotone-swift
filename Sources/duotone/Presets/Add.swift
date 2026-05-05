@@ -32,27 +32,30 @@ extension Duotone {
         var description: String?
 
         mutating func run() throws {
+            let presets = try Duotone.loadPresets()
+            let updated = try addingPreset(to: presets)
+            try Duotone.savePresets(updated)
+            print("Added '\(preset)'")
+        }
+
+        func addingPreset(to existing: [Preset]) throws -> [Preset] {
             let lightColor = try NSColor(hex: lightHexOption)
             let darkColor = try NSColor(hex: darkHexOption)
 
             let contrast = CGFloat(contrastOption ?? 0.5).clamped(to: 0...1)
             let blend = CGFloat(blendOption ?? 1.0).clamped(to: 0...1)
 
-            let preset = Preset(name: preset,
-                                light: lightColor.toHexString(),
-                                dark: darkColor.toHexString(),
-                                contrast: contrast,
-                                blend: blend,
-                                description: description)
+            let newPreset = Preset(name: preset,
+                                   light: lightColor.toHexString(),
+                                   dark: darkColor.toHexString(),
+                                   contrast: contrast,
+                                   blend: blend,
+                                   description: description)
 
-            var presets = try Duotone.loadPresets()
-            let exists = presets.contains { $0.name == preset.name }
-            if exists {
-                throw ValidationError("A preset with the name '\(preset.name)' already exists")
+            if existing.contains(where: { $0.name == newPreset.name }) {
+                throw ValidationError("A preset with the name '\(newPreset.name)' already exists")
             }
-            presets.append(preset)
-            try Duotone.savePresets(presets)
-            print("Added '\(preset.name)'")
+            return existing + [newPreset]
         }
     }
 }
