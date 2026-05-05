@@ -73,10 +73,13 @@ extension Duotone {
         }
 
         private func preset() throws -> Preset {
+            let existing = presetName != nil ? try Duotone.loadPresets() : []
+            return try resolvePreset(from: existing)
+        }
+
+        func resolvePreset(from existing: [Preset]) throws -> Preset {
             if let presetName = presetName {
-                let presets = try Duotone.loadPresets()
-                let preset = presets.first { $0.name == presetName }
-                guard let preset = preset else {
+                guard let preset = existing.first(where: { $0.name == presetName }) else {
                     throw ValidationError("No preset with name '\(presetName)' found.")
                 }
                 if verbose {
