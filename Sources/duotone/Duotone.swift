@@ -132,14 +132,14 @@ extension Duotone {
 
         func processInput() throws -> [File] {
             if let file = try? File(path: inputPath) {
-                if let ext = file.extension, FileFormat.allValidExtensions.contains(ext) {
+                if let ext = file.extension, FileFormat(rawValue: ext) != nil {
                     return [file]
                 }
                 throw ValidationError("\(file.name) is not a valid image format.")
             } else {
                 var inputFiles = [File]()
                 for file in try Folder(path: inputPath).files {
-                    if let ext = file.extension, FileFormat.allValidExtensions.contains(ext) {
+                    if let ext = file.extension, FileFormat(rawValue: ext) != nil {
                         inputFiles.append(file)
                     }
                 }
