@@ -182,4 +182,16 @@ class ProcessTests: XCTestCase {
         let process = try self.parseProcess(inputPath: "\(tempDir)/does-not-exist")
         XCTAssertThrowsError(try process.processInput())
     }
+
+    // MARK: --strict flag
+
+    func testStrictFlag_defaultsToFalse() throws {
+        let process = try self.parseProcess(["-l", "#FFFFFF", "-d", "#000000"])
+        XCTAssertFalse(process.strict)
+    }
+
+    func testStrictFlag_setsToTrueWhenPassed() throws {
+        let process = try self.parseProcess(["-l", "#FFFFFF", "-d", "#000000", "--strict"])
+        XCTAssertTrue(process.strict)
+    }
 }

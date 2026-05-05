@@ -43,6 +43,9 @@ extension Duotone {
         @Flag(name: .shortAndLong, help: "Print verbose output")
         var verbose = false
 
+        @Flag(name: .long, help: "Stop on the first failed image instead of skipping it")
+        var strict = false
+
         @Option(name: [.short, .customLong("out")], help: "Path where the output files are saved")
         var outputPath: String
 
@@ -106,28 +109,43 @@ extension Duotone {
             try FileManager.default.createDirectory(atPath: resolvedOutputPath, withIntermediateDirectories: true)
             let outputFolder = try Folder(path: resolvedOutputPath)
             let processor = try ImageProcessor()
+            var succeeded = 0
+            var skippedCount = 0
             for (index, file) in imagePaths.enumerated() {
                 if verbose {
                     print("- [\(index + 1)/\(imagePaths.count)] Processing: \(file.name)")
                 }
 
-                guard let ext = file.extension,
-                      let format = FileFormat(rawValue: ext),
-                      let inputImage = NSImage(contentsOfFile: file.path)
-                else {
-                    throw ValidationError("Failed to load \(file.name)")
+                do {
+                    guard let ext = file.extension,
+                          let format = FileFormat(rawValue: ext),
+                          let inputImage = NSImage(contentsOfFile: file.path)
+                    else {
+                        throw ValidationError("Failed to load \(file.name)")
+                    }
+                    let outputImage = try processor.colorMap(inputImage,
+                                                             darkColor: darkColor,
+                                                             lightColor: lightColor,
+                                                             contrast: preset.contrast,
+                                                             blend: preset.blend)
+                    guard let outputData = outputImage.imageRepresentation(for: format) as Data? else {
+                        throw ValidationError("Failed to save '\(file.name)'")
+                    }
+                    try outputFolder.createFile(at: file.name, contents: outputData)
+                    succeeded += 1
+                } catch {
+                    if strict {
+                        throw error
+                    }
+                    skippedCount += 1
+                    FileHandle.standardError.write(Data("⚠️  Skipped \(file.name): \(error)\n".utf8))
                 }
-
-                let outputImage = try processor.colorMap(inputImage,
-                                                         darkColor: darkColor,
-                                                         lightColor: lightColor,
-                                                         contrast: preset.contrast,
-                                                         blend: preset.blend)
-                guard let outputData = outputImage.imageRepresentation(for: format) as Data? else {
-                    throw ValidationError("Failed to save '\(file.name)'")
-                }
-
-                try outputFolder.createFile(at: file.name, contents: outputData)
+            }
+            if succeeded == 0 {
+                throw ValidationError("All \(imagePaths.count) image(s) failed to process.")
+            }
+            if verbose, skippedCount > 0 {
+                print("⚠️  Skipped \(skippedCount) of \(imagePaths.count) image(s).")
             }
             return outputFolder
         }
