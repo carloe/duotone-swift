@@ -183,7 +183,7 @@ class ProcessTests: XCTestCase {
         XCTAssertThrowsError(try process.processInput())
     }
 
-    // MARK: --strict flag
+    // MARK: Strict flag
 
     func testStrictFlag_defaultsToFalse() throws {
         let process = try self.parseProcess(["-l", "#FFFFFF", "-d", "#000000"])
