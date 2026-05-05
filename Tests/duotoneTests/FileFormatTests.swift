@@ -60,7 +60,7 @@ class FileFormatTests: XCTestCase {
 
     // MARK: Image Representation
 
-    private func assertRoundTrip(format: FileFormat, file: StaticString = #file, line: UInt = #line) throws {
+    private func assertRoundTrip(format: FileFormat, file: StaticString = #filePath, line: UInt = #line) throws {
         let image = makeTestImage()
         let data = try XCTUnwrap(image.imageRepresentation(for: format) as Data?, "no data produced for \(format)", file: file, line: line)
         XCTAssertGreaterThan(data.count, 0, "\(format) data is empty", file: file, line: line)
