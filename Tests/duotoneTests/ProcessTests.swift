@@ -125,6 +125,29 @@ class ProcessTests: XCTestCase {
         XCTAssertEqual(files[0].name, "image.jpeg")
     }
 
+    func testProcessInput_singleFileWithUppercaseExtension_returnsThatFile() throws {
+        // Regression: real-world camera output uses .JPG (uppercase). The previous
+        // implementation matched extensions case-sensitively and rejected these.
+        let path = try self.writeFile(name: "image.JPG")
+        let process = try self.parseProcess(inputPath: path)
+        let files = try process.processInput()
+        XCTAssertEqual(files.count, 1)
+        XCTAssertEqual(files[0].name, "image.JPG")
+    }
+
+    func testProcessInput_folderWithUppercaseExtensions_returnsThoseFiles() throws {
+        // Regression: the folder branch silently dropped uppercase-extension files,
+        // leaving callers with "No images found" on perfectly valid input.
+        _ = try self.writeFile(name: "a.JPG")
+        _ = try self.writeFile(name: "b.PNG")
+        _ = try self.writeFile(name: "c.TIFF")
+        _ = try self.writeFile(name: "ignore.txt")
+        let process = try self.parseProcess(inputPath: tempDir)
+        let files = try process.processInput()
+        let names = Set(files.map(\.name))
+        XCTAssertEqual(names, Set(["a.JPG", "b.PNG", "c.TIFF"]))
+    }
+
     func testProcessInput_singleFileWithInvalidExtension_throws() throws {
         let path = try self.writeFile(name: "notes.txt")
         let process = try self.parseProcess(inputPath: path)
