@@ -11,7 +11,7 @@ import Files
 
 extension Duotone {
     struct Add: ParsableCommand {
-        static let configuration = CommandConfiguration(abstract: "Add a presets.")
+        static let configuration = CommandConfiguration(abstract: "Add a preset.")
 
         @Option(name: .long, help: "The name of the preset")
         var preset: String

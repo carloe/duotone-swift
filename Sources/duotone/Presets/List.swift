@@ -16,7 +16,12 @@ extension Duotone {
         mutating func run() throws {
             let presets = try Duotone.loadPresets()
             for preset in presets {
-                print("Name: \(preset.name) - Light: \(preset.light), Dark: \(preset.dark), Contrast: \(preset.contrast), Blend: \(preset.blend)")
+                var line = "Name: \(preset.name) - Light: \(preset.light), Dark: \(preset.dark)"
+                line += ", Contrast: \(preset.contrast), Blend: \(preset.blend)"
+                if let description = preset.description, !description.isEmpty {
+                    line += " — \(description)"
+                }
+                print(line)
             }
         }
     }

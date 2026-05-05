@@ -11,7 +11,7 @@ import Files
 
 extension Duotone {
     struct Remove: ParsableCommand {
-        static let configuration = CommandConfiguration(abstract: "Remove a presets.")
+        static let configuration = CommandConfiguration(abstract: "Remove a preset.")
 
         @Option(name: .long, help: "The name of the preset")
         var preset: String
