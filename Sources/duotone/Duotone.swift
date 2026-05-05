@@ -13,7 +13,7 @@ struct DuotoneError: Error, CustomStringConvertible {
 struct Duotone: ParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "A utility for duotoning images.",
-        version: "1.1.1",
+        version: "1.1.2",
         subcommands: [Process.self, Add.self, Remove.self, List.self],
         defaultSubcommand: Process.self)
 }
