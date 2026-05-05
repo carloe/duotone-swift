@@ -7,10 +7,33 @@ import XCTest
 @testable import duotone
 
 class ProcessTests: XCTestCase {
+    private var tempDir: String = ""
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        tempDir = "\(NSTemporaryDirectory())duotone-process-tests-\(UUID().uuidString)"
+        try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try? FileManager.default.removeItem(atPath: tempDir)
+        try super.tearDownWithError()
+    }
+
+    private func writeFile(name: String, in dir: String? = nil) throws -> String {
+        let parent = dir ?? self.tempDir
+        let path = "\(parent)/\(name)"
+        try Data().write(to: URL(fileURLWithPath: path))
+        return path
+    }
 
     // Required args (inputPath, --out) are passed but unused by resolvePreset(from:).
     private func parseProcess(_ extra: [String]) throws -> Duotone.Process {
         try Duotone.Process.parse(["dummy.jpg", "--out", "out"] + extra)
+    }
+
+    private func parseProcess(inputPath: String, _ extra: [String] = []) throws -> Duotone.Process {
+        try Duotone.Process.parse([inputPath, "--out", "out"] + extra)
     }
 
     // MARK: Named preset
@@ -82,5 +105,58 @@ class ProcessTests: XCTestCase {
     func testResolvePreset_cliHex_missingDark_throws() throws {
         let process = try self.parseProcess(["-l", "#FFFFFF"])
         XCTAssertThrowsError(try process.resolvePreset(from: []))
+    }
+
+    // MARK: processInput
+
+    func testProcessInput_singleFileWithValidExtension_returnsThatFile() throws {
+        let path = try self.writeFile(name: "image.png")
+        let process = try self.parseProcess(inputPath: path)
+        let files = try process.processInput()
+        XCTAssertEqual(files.count, 1)
+        XCTAssertEqual(files[0].name, "image.png")
+    }
+
+    func testProcessInput_singleFileWithJpegAlias_returnsThatFile() throws {
+        let path = try self.writeFile(name: "image.jpeg")
+        let process = try self.parseProcess(inputPath: path)
+        let files = try process.processInput()
+        XCTAssertEqual(files.count, 1)
+        XCTAssertEqual(files[0].name, "image.jpeg")
+    }
+
+    func testProcessInput_singleFileWithInvalidExtension_throws() throws {
+        let path = try self.writeFile(name: "notes.txt")
+        let process = try self.parseProcess(inputPath: path)
+        XCTAssertThrowsError(try process.processInput())
+    }
+
+    func testProcessInput_folder_returnsOnlyValidFormatFiles() throws {
+        _ = try self.writeFile(name: "a.png")
+        _ = try self.writeFile(name: "b.jpg")
+        _ = try self.writeFile(name: "ignore.txt")
+        _ = try self.writeFile(name: "readme.md")
+        let process = try self.parseProcess(inputPath: tempDir)
+        let files = try process.processInput()
+        let names = Set(files.map(\.name))
+        XCTAssertEqual(names, Set(["a.png", "b.jpg"]))
+    }
+
+    func testProcessInput_folderWithNoSupportedFiles_returnsEmpty() throws {
+        _ = try self.writeFile(name: "ignore.txt")
+        let process = try self.parseProcess(inputPath: tempDir)
+        let files = try process.processInput()
+        XCTAssertEqual(files.count, 0)
+    }
+
+    func testProcessInput_emptyFolder_returnsEmpty() throws {
+        let process = try self.parseProcess(inputPath: tempDir)
+        let files = try process.processInput()
+        XCTAssertEqual(files.count, 0)
+    }
+
+    func testProcessInput_nonExistentPath_throws() throws {
+        let process = try self.parseProcess(inputPath: "\(tempDir)/does-not-exist")
+        XCTAssertThrowsError(try process.processInput())
     }
 }
