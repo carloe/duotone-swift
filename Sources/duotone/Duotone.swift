@@ -1,5 +1,6 @@
 import AppKit
 import ArgumentParser
+import Darwin
 import Files
 import Foundation
 
@@ -46,6 +47,9 @@ extension Duotone {
         @Flag(name: .long, help: "Stop on the first failed image instead of skipping it")
         var strict = false
 
+        @Flag(name: .long, help: "Disable the progress bar (auto-disabled when stderr is not a TTY)")
+        var noProgress = false
+
         @Option(name: [.short, .customLong("out")], help: "Path where the output files are saved")
         var outputPath: String
 
@@ -65,14 +69,26 @@ extension Duotone {
                 print("⚙️ Processing \(imagePaths.count) images...")
             }
 
-            let outputFolder = try process(imagePaths, preset: preset)
+            let reporter = self.makeProgressReporter(total: imagePaths.count)
+            let result = try process(imagePaths, preset: preset, reporter: reporter)
+
+            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            reporter?.finish(succeeded: result.succeeded, skipped: result.skipped, elapsed: timeElapsed)
 
             if verbose == true {
-                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
                 print("🚀 Done!\n")
-                print("📂 Output: \(outputFolder.path)")
+                print("📂 Output: \(result.folder.path)")
                 print("⏱ Completed in \(String(format: "%.3f", timeElapsed))s")
             }
+        }
+
+        private func makeProgressReporter(total: Int) -> ProgressReporter? {
+            guard total > 1, !self.verbose, !self.noProgress, isatty(fileno(stderr)) != 0 else { return nil }
+            return ProgressReporter(
+                total: total,
+                isInteractive: true,
+                writer: { FileHandle.standardError.write(Data($0.utf8)) }
+            )
         }
 
         private func preset() throws -> Preset {
@@ -101,7 +117,13 @@ extension Duotone {
             return Preset(name: "cli", light: lightHexOption, dark: darkHexOption, contrast: contrast, blend: blend, description: nil)
         }
 
-        private func process(_ imagePaths: [File], preset: Preset) throws -> Folder {
+        struct BatchResult {
+            let folder: Folder
+            let succeeded: Int
+            let skipped: Int
+        }
+
+        private func process(_ imagePaths: [File], preset: Preset, reporter: ProgressReporter?) throws -> BatchResult {
             let lightColor = try NSColor(hex: preset.light)
             let darkColor = try NSColor(hex: preset.dark)
 
@@ -112,6 +134,7 @@ extension Duotone {
             var succeeded = 0
             var skippedCount = 0
             for (index, file) in imagePaths.enumerated() {
+                reporter?.update(current: index + 1, filename: file.name)
                 if verbose {
                     print("- [\(index + 1)/\(imagePaths.count)] Processing: \(file.name)")
                 }
@@ -138,6 +161,7 @@ extension Duotone {
                         throw error
                     }
                     skippedCount += 1
+                    reporter?.clearLine()
                     FileHandle.standardError.write(Data("⚠️  Skipped \(file.name): \(error)\n".utf8))
                 }
             }
@@ -147,7 +171,7 @@ extension Duotone {
             if verbose, skippedCount > 0 {
                 print("⚠️  Skipped \(skippedCount) of \(imagePaths.count) image(s).")
             }
-            return outputFolder
+            return BatchResult(folder: outputFolder, succeeded: succeeded, skipped: skippedCount)
         }
 
         func processInput() throws -> [File] {
