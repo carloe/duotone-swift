@@ -1,6 +1,5 @@
 import AppKit
 import ArgumentParser
-import Darwin
 import Files
 import Foundation
 
@@ -83,10 +82,16 @@ extension Duotone {
         }
 
         private func makeProgressReporter(total: Int) -> ProgressReporter? {
-            guard total > 1, !self.verbose, !self.noProgress, isatty(fileno(stderr)) != 0 else { return nil }
+            guard ProgressReporter.shouldShow(
+                total: total,
+                verbose: self.verbose,
+                noProgress: self.noProgress,
+                isStderrTTY: ProgressReporter.isStderrInteractive()
+            ) else { return nil }
             return ProgressReporter(
                 total: total,
                 isInteractive: true,
+                lineWidth: ProgressReporter.terminalWidth(),
                 writer: { FileHandle.standardError.write(Data($0.utf8)) }
             )
         }
